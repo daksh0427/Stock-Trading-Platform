@@ -1,0 +1,58 @@
+CREATE DATABASE IF NOT EXISTS stockdb;
+USE stockdb;
+
+CREATE TABLE IF NOT EXISTS Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    refresh_token TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS wallet (
+    wallet_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    balance DECIMAL(15, 2) DEFAULT 0.00,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS stock (
+    stock_id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_name VARCHAR(255) UNIQUE NOT NULL,
+    price DECIMAL(15, 2) NOT NULL,
+    last_price DECIMAL(15, 2) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS portfolios (
+    portfolio_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    quantity INT NOT NULL,
+    avg_buy_price DECIMAL(15, 2) NOT NULL,
+    stock_name VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Trades (
+    trade_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    trade_type ENUM('BUY', 'SELL') NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(15, 2) NOT NULL,
+    total_amount DECIMAL(15, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    stock_name VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS stockhistory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_name VARCHAR(255) NOT NULL,
+    price DECIMAL(15, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
